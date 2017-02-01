@@ -6,7 +6,6 @@ Strap is a script to bootstrap a minimal OS X development system. This does not 
 - Enables the OS X screensaver password immediately (for better security)
 - Enables the OS X application firewall (for better security)
 - Adds a `Found this computer?` message to the login screen (for machine recovery)
-- Enables full-disk encryption and saves the FileVault Recovery Key to the Desktop (for better security)
 - Installs the Xcode Command Line Tools (for compilers and Unix tools)
 - Agree to the Xcode license (for using compilers without prompts)
 - Installs [Homebrew](http://brew.sh) (for installing command-line software)
