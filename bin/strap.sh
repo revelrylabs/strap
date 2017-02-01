@@ -100,24 +100,6 @@ if [ -n "$STRAP_GIT_NAME" ] && [ -n "$STRAP_GIT_EMAIL" ]; then
 fi
 logk
 
-# Check and enable full-disk encryption.
-logn "Checking full-disk encryption status:"
-if fdesetup status | grep $Q -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
-  logk
-elif [ -n "$STRAP_CI" ]; then
-  echo
-  logn "Skipping full-disk encryption for CI"
-elif [ -n "$STRAP_INTERACTIVE" ]; then
-  echo
-  log "Enabling full-disk encryption on next reboot:"
-  sudo fdesetup enable -user "$USER" \
-    | tee ~/Desktop/"FileVault Recovery Key.txt"
-  logk
-else
-  echo
-  abort "Run 'sudo fdesetup enable -user \"$USER\"' to enable full-disk encryption."
-fi
-
 # Install the Xcode Command Line Tools.
 DEVELOPER_DIR=$("xcode-select" -print-path 2>/dev/null || true)
 if [ -z "$DEVELOPER_DIR" ] || ! [ -f "$DEVELOPER_DIR/usr/bin/git" ] \
