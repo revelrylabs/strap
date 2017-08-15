@@ -20,18 +20,18 @@ Strap is a script to bootstrap a minimal OS X development system. This does not 
 - Mostly idempotent (the slow bit is rerunning `brew update`)
 
 ## Usage
-Open https://osx-strap.herokuapp.com in your web browser.
+Open https://revelry-strap.herokuapp.com in your web browser.
 
 Alternatively, to run Strap locally run:
 ```bash
-git clone https://github.com/mikemcquaid/strap
+git clone https://github.com/revelrylabs/strap
 cd strap
 bash bin/strap.sh # or bash bin/strap.sh --debug for more debugging output
 ```
 
 Alternatively, to run the web application locally run:
 ```bash
-git clone https://github.com/mikemcquaid/strap
+git clone https://github.com/revelrylabs/strap
 cd strap
 GITHUB_KEY="..." GITHUB_SECRET="..." ./script/server
 ```
