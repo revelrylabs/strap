@@ -54,7 +54,7 @@ STDIN_FILE_DESCRIPTOR="0"
 # STRAP_GIT_EMAIL=
 # STRAP_GITHUB_USER=
 # STRAP_GITHUB_TOKEN=
-STRAP_ISSUES_URL="https://github.com/mikemcquaid/strap/issues/new"
+STRAP_ISSUES_URL="https://github.com/revelrylabs/strap/issues/new"
 
 STRAP_FULL_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 
@@ -276,8 +276,18 @@ if [ -n "$STRAP_GITHUB_USER" ]; then
   fi
 fi
 
+# check for existing .Brewfile and offer to delete it before starting
+if [ -f "$HOME/.Brewfile" ]; then
+  echo "Existing .Brewfile detected at $HOME/.Brewfile. Would you like me to delete it and download a fresh one? (Y/n)"
+  read DELETE
+  if [ "$DELETE" = "y" ] || [ "$DELETE" = "Y" ] || ["$DELETE" == ""]; then
+    rm "$HOME/.Brewfile"
+  fi
+fi
+
 # Setup Brewfile
 if [ -n "$STRAP_GITHUB_USER" ] && ! [ -f "$HOME/.Brewfile" ]; then
+  echo "checking github for $STRAP_GITHUB_USER/homebrew-brewfile"
   HOMEBREW_BREWFILE_URL="https://github.com/$STRAP_GITHUB_USER/homebrew-brewfile"
 
   if git ls-remote "$HOMEBREW_BREWFILE_URL" &>/dev/null; then
@@ -297,12 +307,54 @@ if [ -n "$STRAP_GITHUB_USER" ] && ! [ -f "$HOME/.Brewfile" ]; then
   fi
 fi
 
+# get default Brewfile from this repo if the previous step didn't pull a personal one
+if ! [ -f "$HOME/.Brewfile" ]; then
+  STRAP_REPO_URL="https://github.com/revelrylabs/strap"
+
+  if git ls-remote "$STRAP_URL" &>/dev/null; then
+    log "Fetching Default Brewfile from $STRAP_REPO_URL:"
+    if [ ! -d "$HOME/.strap" ]; then
+      log "Cloning to ~/.strap:"
+      git clone $Q "$STRAP_URL" ~/.strap
+      logk
+    else
+      (
+        cd ~/.strap
+        git pull $Q
+      )
+    fi
+    ln -sf ~/.strap/Brewfile ~/.Brewfile
+    logk
+  fi
+fi
 # Install from local Brewfile
 if [ -f "$HOME/.Brewfile" ]; then
   log "Installing from user Brewfile on GitHub:"
   brew bundle --global
   logk
 fi
+
+# now install ASDF
+git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
+
+echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
+echo "If you don't know what this means, just press ENTER"
+read SHELLRC_PATH
+
+if [ "$SHELLRC_PATH" = "" ]; then
+  SHELLRC="$HOME/.bash_profile"
+fi
+
+echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
+echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
+source $SHELLRC
+
+asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
+asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+
+# install gpg keys for nodejs releases
+bash $HOME/.asdf/plugins/nodejs/bin/import-release-team-keyring
 
 STRAP_SUCCESS="1"
 log "Your system is now Strap'd!"

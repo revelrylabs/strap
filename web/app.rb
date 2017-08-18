@@ -7,8 +7,8 @@ require "awesome_print" if ENV["RACK_ENV"] == "development"
 GITHUB_KEY = ENV["GITHUB_KEY"]
 GITHUB_SECRET = ENV["GITHUB_SECRET"]
 SESSION_SECRET = ENV["SESSION_SECRET"] || SecureRandom.hex
-STRAP_ISSUES_URL = ENV["STRAP_ISSUES_URL"] || \
-                   "https://github.com/mikemcquaid/strap/issues/new"
+STRAP_REPO_URL = ENV["STRAP_REPO_URL"] || "https://github.com/revelrylabs/strap"
+STRAP_ISSUES_URL = ENV["STRAP_ISSUES_URL"] || STRAP_REPO_URL + "issues/new"
 STRAP_BEFORE_INSTALL = ENV["STRAP_BEFORE_INSTALL"]
 
 set :sessions, secret: SESSION_SECRET
@@ -67,6 +67,7 @@ get "/strap.sh" do
 
   content = IO.read(File.expand_path("#{File.dirname(__FILE__)}/../bin/strap.sh"))
   content.gsub!(/^STRAP_ISSUES_URL=.*$/, "STRAP_ISSUES_URL='#{STRAP_ISSUES_URL}'")
+  content.gsub!(/^STRAP_REPO_URL=.*$/, "STRAP_REPO_URL='#{STRAP_REPO_URL}'")
 
   content_type = params["text"] ? "text/plain" : "application/octet-stream"
 
