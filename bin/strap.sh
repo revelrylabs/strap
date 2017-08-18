@@ -335,26 +335,29 @@ if [ -f "$HOME/.Brewfile" ]; then
 fi
 
 # now install ASDF
-git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
+if [ ! -d "$HOME/.asdf"]; then
+  echo "Installing ASDF version manager"
+  git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
 
-echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
-echo "If you don't know what this means, just press ENTER"
-read SHELLRC_PATH
+  echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
+  echo "If you don't know what this means, just press ENTER"
+  read SHELLRC_PATH
 
-if [ "$SHELLRC_PATH" = "" ]; then
-  SHELLRC="$HOME/.bash_profile"
+  if [ "$SHELLRC_PATH" = "" ]; then
+    SHELLRC="$HOME/.bash_profile"
+  fi
+
+  echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
+  echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
+  source $SHELLRC
+
+  asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
+  asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+
+  # install gpg keys for nodejs releases
+  bash $HOME/.asdf/plugins/nodejs/bin/import-release-team-keyring
 fi
-
-echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
-echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
-source $SHELLRC
-
-asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
-asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
-
-# install gpg keys for nodejs releases
-bash $HOME/.asdf/plugins/nodejs/bin/import-release-team-keyring
 
 STRAP_SUCCESS="1"
 log "Your system is now Strap'd!"
