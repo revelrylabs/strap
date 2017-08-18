@@ -311,11 +311,11 @@ fi
 if ! [ -f "$HOME/.Brewfile" ]; then
   STRAP_REPO_URL="https://github.com/revelrylabs/strap"
 
-  if git ls-remote "$STRAP_URL" &>/dev/null; then
+  if git ls-remote "$STRAP_REPO_URL" &>/dev/null; then
     log "Fetching Default Brewfile from $STRAP_REPO_URL:"
     if [ ! -d "$HOME/.strap" ]; then
       log "Cloning to ~/.strap:"
-      git clone $Q "$STRAP_URL" ~/.strap
+      git clone $Q "$STRAP_REPO_URL" ~/.strap
       logk
     else
       (
