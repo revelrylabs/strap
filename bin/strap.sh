@@ -351,6 +351,7 @@ if [ ! -d "$HOME/.asdf"]; then
 
   echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
   echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
+  echo -e '\n. NODEJS_CHECK_SIGNATURES=no' >> $SHELLRC
   source $SHELLRC
 
   asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
