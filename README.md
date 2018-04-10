@@ -4,6 +4,9 @@ A script to bootstrap a minimal macOS development system. This does not assume y
 ## Motivation
 Replacing [Boxen](https://github.com/boxen/boxen/) in [GitHub](https://github.com/) with a better tool. This post outlines the problems with Boxen and requirements for Strap and other tools used by GitHub: http://mikemcquaid.com/2016/06/15/replacing-boxen/
 
+## Why is this a fork??
+We've made some customizations from Mike McQuaid's original scripts. Ours does additional things like install asdf.
+
 ## Features
 - Disables Java in Safari (for better security)
 - Enables the macOS screensaver password immediately (for better security)
