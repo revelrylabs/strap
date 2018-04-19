@@ -337,7 +337,7 @@ if [ -f "$HOME/.Brewfile" ]; then
 fi
 
 # now install ASDF
-if [ ! -d "$HOME/.asdf"]; then
+if [ ! -d "$HOME/.asdf" ]; then
   echo "Installing ASDF version manager"
   git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
 
