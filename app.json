@@ -1,8 +1,8 @@
 {
   "name": "Strap",
-  "description": "Bootstrap a minimal macOS development system",
-  "website": "https://github.com/MikeMcQuaid/strap",
-  "repository": "https://github.com/MikeMcQuaid/strap",
+  "description": "Bootstrap a minimal macOS development system w/o FDE",
+  "website": "https://github.com/revelrylabs/strap",
+  "repository": "https://github.com/revelrylabs/strap",
   "keywords": ["ruby", "strap"],
   "success_url": "/",
   "env": {

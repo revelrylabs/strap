@@ -9,8 +9,8 @@ require "awesome_print" if ENV["RACK_ENV"] == "development"
 GITHUB_KEY = ENV["GITHUB_KEY"]
 GITHUB_SECRET = ENV["GITHUB_SECRET"]
 SESSION_SECRET = ENV["SESSION_SECRET"] || SecureRandom.hex
-STRAP_ISSUES_URL_DEFAULT = "https://github.com/MikeMcQuaid/strap/issues/new"
-STRAP_ISSUES_URL = ENV["STRAP_ISSUES_URL"] || STRAP_ISSUES_URL_DEFAULT
+STRAP_REPO_URL = ENV["STRAP_REPO_URL"] || "https://github.com/revelrylabs/strap"
+STRAP_ISSUES_URL = ENV["STRAP_ISSUES_URL"] || STRAP_REPO_URL + "issues/new"
 STRAP_BEFORE_INSTALL = ENV["STRAP_BEFORE_INSTALL"]
 CUSTOM_HOMEBREW_TAP = ENV["CUSTOM_HOMEBREW_TAP"]
 CUSTOM_BREW_COMMAND = ENV["CUSTOM_BREW_COMMAND"]
@@ -103,6 +103,9 @@ get "/strap.sh" do
 
   set_variables = { STRAP_ISSUES_URL: STRAP_ISSUES_URL }
   unset_variables = {}
+  
+  content.gsub!(/^STRAP_ISSUES_URL=.*$/, "STRAP_ISSUES_URL='#{STRAP_ISSUES_URL}'")
+  content.gsub!(/^STRAP_REPO_URL=.*$/, "STRAP_REPO_URL='#{STRAP_REPO_URL}'")
 
   if CUSTOM_HOMEBREW_TAP
     unset_variables[:CUSTOM_HOMEBREW_TAP] = CUSTOM_HOMEBREW_TAP

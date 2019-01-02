@@ -46,7 +46,7 @@ STDIN_FILE_DESCRIPTOR="0"
 # STRAP_GITHUB_TOKEN=
 # CUSTOM_HOMEBREW_TAP=
 # CUSTOM_BREW_COMMAND=
-STRAP_ISSUES_URL='https://github.com/MikeMcQuaid/strap/issues/new'
+STRAP_ISSUES_URL='https://github.com/revelrylabs/strap/issues/new'
 
 # We want to always prompt for sudo password at least once rather than doing
 # root stuff unexpectedly.
@@ -102,24 +102,6 @@ if [ -n "$STRAP_GIT_NAME" ] && [ -n "$STRAP_GIT_EMAIL" ]; then
     "$LOGIN_TEXT"
 fi
 logk
-
-# Check and enable full-disk encryption.
-logn "Checking full-disk encryption status:"
-if fdesetup status | grep $Q -E "FileVault is (On|Off, but will be enabled after the next restart)."; then
-  logk
-elif [ -n "$STRAP_CI" ]; then
-  echo
-  logn "Skipping full-disk encryption for CI"
-elif [ -n "$STRAP_INTERACTIVE" ]; then
-  echo
-  log "Enabling full-disk encryption on next reboot:"
-  sudo fdesetup enable -user "$USER" \
-    | tee ~/Desktop/"FileVault Recovery Key.txt"
-  logk
-else
-  echo
-  abort "Run 'sudo fdesetup enable -user \"$USER\"' to enable full-disk encryption."
-fi
 
 # Install the Xcode Command Line Tools.
 if ! [ -f "/Library/Developer/CommandLineTools/usr/bin/git" ]
@@ -313,8 +295,18 @@ if [ -n "$STRAP_GITHUB_USER" ]; then
   fi
 fi
 
+# check for existing .Brewfile and offer to delete it before starting
+if [ -f "$HOME/.Brewfile" ]; then
+  echo "Existing .Brewfile detected at $HOME/.Brewfile. Would you like me to delete it and download a fresh one? (Y/n)"
+  read DELETE
+  if [ "$DELETE" = "y" ] || [ "$DELETE" = "Y" ] || ["$DELETE" == ""]; then
+    rm "$HOME/.Brewfile"
+  fi
+fi
+
 # Setup Brewfile
-if [ -n "$STRAP_GITHUB_USER" ] && { [ ! -f "$HOME/.Brewfile" ] || [ "$HOME/.Brewfile" -ef "$HOME/.homebrew-brewfile/Brewfile" ]; }; then
+if [ -n "$STRAP_GITHUB_USER" ] && ( [ ! -f "$HOME/.Brewfile" ] || [ "$HOME/.Brewfile" -ef "$HOME/.homebrew-brewfile/Brewfile" ] ); then
+  echo "checking github for $STRAP_GITHUB_USER/homebrew-brewfile"
   HOMEBREW_BREWFILE_URL="https://github.com/$STRAP_GITHUB_USER/homebrew-brewfile"
 
   if git ls-remote "$HOMEBREW_BREWFILE_URL" &>/dev/null; then
@@ -330,6 +322,27 @@ if [ -n "$STRAP_GITHUB_USER" ] && { [ ! -f "$HOME/.Brewfile" ] || [ "$HOME/.Brew
       )
     fi
     ln -sf ~/.homebrew-brewfile/Brewfile ~/.Brewfile
+    logk
+  fi
+fi
+
+# get default Brewfile from this repo if the previous step didn't pull a personal one
+if ( [ ! -f "$HOME/.Brewfile" ] || [ "$HOME/.Brewfile" -ef "$HOME/.homebrew-brewfile/Brewfile" ] ); then
+  STRAP_REPO_URL="https://github.com/revelrylabs/strap"
+
+  if git ls-remote "$STRAP_REPO_URL" &>/dev/null; then
+    log "Fetching Default Brewfile from $STRAP_REPO_URL:"
+    if [ ! -d "$HOME/.strap" ]; then
+      log "Cloning to ~/.strap:"
+      git clone $Q "$STRAP_REPO_URL" ~/.strap
+      logk
+    else
+      (
+        cd ~/.strap
+        git pull $Q
+      )
+    fi
+    ln -sf ~/.strap/Brewfile ~/.Brewfile
     logk
   fi
 fi
@@ -354,6 +367,32 @@ if [ -n "$CUSTOM_BREW_COMMAND" ]; then
   log "Executing 'brew $CUSTOM_BREW_COMMAND':"
   brew "$CUSTOM_BREW_COMMAND"
   logk
+fi
+
+# now install ASDF
+if [ ! -d "$HOME/.asdf" ]; then
+  echo "Installing ASDF version manager"
+  git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
+
+  echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
+  echo "If you don't know what this means, just press ENTER"
+  read SHELLRC_PATH
+
+  if [ "$SHELLRC_PATH" = "" ]; then
+    SHELLRC="$HOME/.bash_profile"
+  fi
+
+  echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
+  echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
+  echo -e '\n. NODEJS_CHECK_SIGNATURES=no' >> $SHELLRC
+  source $SHELLRC
+
+  asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
+  asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+  asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+
+  # install gpg keys for nodejs releases
+  bash $HOME/.asdf/plugins/nodejs/bin/import-release-team-keyring
 fi
 
 STRAP_SUCCESS="1"
