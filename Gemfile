@@ -1,4 +1,5 @@
 source "https://rubygems.org"
+ruby "2.6.0"
 
 ruby IO.read(File.expand_path("#{File.dirname(__FILE__)}/.ruby-version")).strip
 
