@@ -380,6 +380,10 @@ if [ ! -d "$HOME/.asdf" ]; then
 
   if [ "$SHELLRC_PATH" = "" ]; then
     SHELLRC="$HOME/.bash_profile"
+
+    if [[ ! -f $SHELLRC ]]; then
+      touch $SHELLRC
+    fi
   fi
 
   echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
