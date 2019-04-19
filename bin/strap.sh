@@ -378,7 +378,7 @@ if [ ! -d "$HOME/.asdf" ]; then
     echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
     echo "If you don't know what this means, just press ENTER"
     read SHELLRC
-    # ~ is not expanded by default
+    # ~ does not get expanded by default, so do the substitution manually
     SHELLRC="${SHELLRC/#\~/$HOME}"
 
     if [ "$SHELLRC" == "" ]; then
