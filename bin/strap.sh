@@ -400,9 +400,9 @@ if [ ! -d "$HOME/.asdf" ]; then
 
   getShellRCPath
 
-  echo -e '. $HOME/.asdf/asdf.sh' >> $SHELLRC
-  echo -e '. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
-  echo -e 'NODEJS_CHECK_SIGNATURES=no' >> $SHELLRC
+  echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
+  echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
+  echo -e '\nNODEJS_CHECK_SIGNATURES=no' >> $SHELLRC
   source $SHELLRC
 
   asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
