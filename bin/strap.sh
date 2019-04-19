@@ -374,21 +374,35 @@ if [ ! -d "$HOME/.asdf" ]; then
   echo "Installing ASDF version manager"
   git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
 
-  echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
-  echo "If you don't know what this means, just press ENTER"
-  read SHELLRC_PATH
+  getShellRCPath() {
+    echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
+    echo "If you don't know what this means, just press ENTER"
+    read SHELLRC
+    # ~ is not expanded by default
+    SHELLRC="${SHELLRC/#\~/$HOME}"
 
-  if [ "$SHELLRC_PATH" = "" ]; then
-    SHELLRC="$HOME/.bash_profile"
-
-    if [[ ! -f $SHELLRC ]]; then
-      touch $SHELLRC
+    if [ "$SHELLRC" == "" ]; then
+      SHELLRC="$HOME/.bash_profile"
     fi
-  fi
 
-  echo -e '\n. $HOME/.asdf/asdf.sh' >> $SHELLRC
-  echo -e '\n. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
-  echo -e '\n. NODEJS_CHECK_SIGNATURES=no' >> $SHELLRC
+    if [ ! -f $SHELLRC ]; then
+      echo "$SHELLRC does not exist! Would you like to create it? y/n"
+      echo "(Entering 'n' will prompt you to enter a different path)"
+      read CONFIRM_CREATE_SHELLRC
+
+      if [ "$CONFIRM_CREATE_SHELLRC" == "y" ]; then
+        touch $SHELLRC
+      else
+        getShellRCPath
+      fi
+    fi
+  }
+
+  getShellRCPath
+
+  echo -e '. $HOME/.asdf/asdf.sh' >> $SHELLRC
+  echo -e '. $HOME/.asdf/completions/asdf.bash' >> $SHELLRC
+  echo -e 'NODEJS_CHECK_SIGNATURES=no' >> $SHELLRC
   source $SHELLRC
 
   asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
