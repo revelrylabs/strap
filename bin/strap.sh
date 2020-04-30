@@ -419,14 +419,14 @@ if [ ! -d "$HOME/.asdf" ]; then
   git clone https://github.com/asdf-vm/asdf.git $HOME/.asdf --branch v0.3.0
 
   getShellRCPath() {
-    echo "Please enter your shell's configuration file path (default: ~/.bash_profile)"
+    echo "Please enter your shell's configuration file path (default: ~/.zshrc)"
     echo "If you don't know what this means, just press ENTER"
     read SHELLRC
     # ~ does not get expanded by default, so do the substitution manually
     SHELLRC="${SHELLRC/#\~/$HOME}"
 
     if [ "$SHELLRC" == "" ]; then
-      SHELLRC="$HOME/.bash_profile"
+      SHELLRC="$HOME/.zshrc"
     fi
 
     if [ ! -f $SHELLRC ]; then
